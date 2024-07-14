@@ -17,4 +17,4 @@ Run the bot;
 
 It will ask for your credentials.
 
-And that is it!
+And that is it! You can also build the docker container and use that instead.
