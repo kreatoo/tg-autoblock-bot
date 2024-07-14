@@ -7,7 +7,7 @@ api_hash = 'jgjotr0eq2iewjfjgghkhohoh'
 message = 'You are not in my contacts, blocking!'
 
 # Session name
-session_name'tg-autoblock-bot'
+session_name='tg-autoblock-bot'
 client = TelegramClient(session_name, api_id, api_hash)
 
 @client.on(events.NewMessage())
