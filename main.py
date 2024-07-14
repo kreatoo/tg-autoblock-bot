@@ -1,5 +1,5 @@
-from telethon import TelegramClient, events, sync
-from telethon import functions, types
+from telethon import TelegramClient, events, functions
+from telethon.errors import PeerIdInvalidError
 
 # Remember to change these!
 api_id = 45678
@@ -7,28 +7,34 @@ api_hash = 'jgjotr0eq2iewjfjgghkhohoh'
 message = 'You are not in my contacts, blocking!'
 
 # Session name
-session_name='tg-autoblock-bot'
+session_name = 'tg-autoblock-bot'
 client = TelegramClient(session_name, api_id, api_hash)
 
 @client.on(events.NewMessage())
 async def handler(event):
-    if not event.contact:
-        sender = await event.get_sender()
-        
+    sender = await event.get_sender()
+    
+    if sender and sender.bot is False:  # Check if the sender is not a bot
         try:
-            # Send a message to the sender
-            await client.send_message(sender.id, message)
+            # Get contacts
+            contacts = await client(functions.contacts.GetContactsRequest(hash=0))
+            sender_in_contacts = any(contact.id == sender.id for contact in contacts.users)
 
-            # Block the sender
-            await client(functions.contacts.BlockRequest(id=sender.id))
+            if not sender_in_contacts and sender.id != (await client.get_me()).id:
+                
+                # Send a message to the sender
+                await client.send_message(sender.id, message)
 
-            # Delete the chat history
-            await client(functions.messages.DeleteHistoryRequest(
-                peer=sender.id,
-                max_id=0,
-                just_clear=True,
-                revoke=False
-            ))
+                # Block the sender
+                await client(functions.contacts.BlockRequest(id=sender.id))
+
+                # Delete the chat history
+                await client(functions.messages.DeleteHistoryRequest(
+                    peer=sender.id,
+                    max_id=0,
+                    just_clear=True,
+                    revoke=False
+                ))
 
         except PeerIdInvalidError:
             print(f"Invalid peer ID for sender: {sender.id}. Skipping this sender.")
