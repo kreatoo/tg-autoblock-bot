@@ -36,8 +36,6 @@ async def handler(event):
                     revoke=False
                 ))
 
-        except PeerIdInvalidError:
-            print(f"Invalid peer ID for sender: {sender.id}. Skipping this sender.")
         except Exception as e:
             print(f"An error occurred: {e}")
 
