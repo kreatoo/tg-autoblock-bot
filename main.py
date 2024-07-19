@@ -14,7 +14,8 @@ client = TelegramClient(session_name, api_id, api_hash)
 async def handler(event):
     sender = await event.get_sender()
     
-    if sender and sender.bot is False:  # Check if the sender is not a bot
+    if event.message and event.message.sender and not event.message.sender.bot:
+  # Check if sender is a message and the sender is not a bot
         try:
             # Get contacts
             contacts = await client(functions.contacts.GetContactsRequest(hash=0))
